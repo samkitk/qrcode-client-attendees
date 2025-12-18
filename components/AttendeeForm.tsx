@@ -5,235 +5,200 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Search, UserPlus } from 'lucide-react';
-import { attendeeApi, type Attendee, type AttendeeRegistrationRequest } from '@/lib/api';
+import { Loader2, Search, Info } from 'lucide-react';
+import { attendeeApi, type Attendee, type VerifyRequest } from '@/lib/api';
 
 interface AttendeeFormProps {
-  onAttendeeFound: (attendee: Attendee) => void;
+  onAttendeeVerified: (attendee: Attendee, correctionMessage?: string) => void;
 }
 
-export default function AttendeeForm({ onAttendeeFound }: AttendeeFormProps) {
+export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) {
   const [mobile, setMobile] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [showRegistration, setShowRegistration] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [identifier, setIdentifier] = useState('');
+  const [name, setName] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState('');
-  
-  const [registrationData, setRegistrationData] = useState<AttendeeRegistrationRequest>({
-    mobile: '',
-    name: '',
-    email: '',
-    organization: '',
-    designation: '',
-  });
+  const [verifyMode, setVerifyMode] = useState<'identifier' | 'name'>('identifier');
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!mobile.trim()) {
-      setError('Please enter a mobile number');
+      setError('Please enter your mobile number');
       return;
     }
 
-    setIsSearching(true);
+    if (verifyMode === 'identifier' && !identifier.trim()) {
+      setError('Please enter your confirmation or application number');
+      return;
+    }
+
+    if (verifyMode === 'name' && !name.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+
+    setIsVerifying(true);
     setError('');
 
     try {
-      const attendee = await attendeeApi.getByMobile(mobile);
-      onAttendeeFound(attendee);
-    } catch (err: any) {
-      console.error('Error fetching attendee:', err);
-      if (err.response?.status === 404) {
-        setShowRegistration(true);
-        setRegistrationData({ ...registrationData, mobile });
+      const requestData: VerifyRequest = {
+        mobile: mobile.trim(),
+      };
+
+      if (verifyMode === 'identifier') {
+        requestData.identifier = identifier.trim();
       } else {
-        setError(err.message || 'Failed to fetch attendee details. Please try again.');
+        requestData.name = name.trim();
+      }
+
+      const response = await attendeeApi.verify(requestData);
+      
+      // Show correction message if duplicate was fixed
+      const message = response.corrected 
+        ? response.message 
+        : undefined;
+
+      onAttendeeVerified(response.attendee, message);
+    } catch (err: any) {
+      console.error('Error verifying attendee:', err);
+      
+      if (err.response?.status === 404) {
+        setError('No attendee found with the provided details. Please check your mobile number and confirmation/application number.');
+      } else {
+        setError(err.message || 'Failed to verify details. Please try again.');
       }
     } finally {
-      setIsSearching(false);
+      setIsVerifying(false);
     }
   };
-
-  const handleRegistration = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!registrationData.name || !registrationData.email) {
-      setError('Name and email are required');
-      return;
-    }
-
-    setIsRegistering(true);
-    setError('');
-
-    try {
-      const attendee = await attendeeApi.register(registrationData);
-      onAttendeeFound(attendee);
-      setShowRegistration(false);
-    } catch (err: any) {
-      console.error('Error registering attendee:', err);
-      setError(err.message || 'Failed to register. Please try again.');
-    } finally {
-      setIsRegistering(false);
-    }
-  };
-
-  const handleInputChange = (field: keyof AttendeeRegistrationRequest, value: string) => {
-    setRegistrationData(prev => ({ ...prev, [field]: value }));
-  };
-
-  if (showRegistration) {
-    return (
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-6 w-6" />
-            New Attendee Registration
-          </CardTitle>
-          <CardDescription>
-            Mobile number not found. Please register with your details.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleRegistration} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number *</Label>
-              <Input
-                id="mobile"
-                type="tel"
-                value={registrationData.mobile}
-                onChange={(e) => handleInputChange('mobile', e.target.value)}
-                placeholder="Enter mobile number"
-                required
-                disabled
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name *</Label>
-              <Input
-                id="name"
-                type="text"
-                value={registrationData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={registrationData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="organization">Organization</Label>
-              <Input
-                id="organization"
-                type="text"
-                value={registrationData.organization}
-                onChange={(e) => handleInputChange('organization', e.target.value)}
-                placeholder="Enter your organization"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="designation">Designation</Label>
-              <Input
-                id="designation"
-                type="text"
-                value={registrationData.designation}
-                onChange={(e) => handleInputChange('designation', e.target.value)}
-                placeholder="Enter your designation"
-              />
-            </div>
-
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
-                {error}
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setShowRegistration(false);
-                  setMobile('');
-                }}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isRegistering} className="flex-1">
-                {isRegistering ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Registering...
-                  </>
-                ) : (
-                  'Register'
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Search className="h-6 w-6" />
-          Attendee Check-in
+          Attendee Verification
         </CardTitle>
         <CardDescription>
-          Enter your mobile number to retrieve your event details and QR code.
+          Enter your details to access your event QR code and ID card
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSearch} className="space-y-4">
+        <form onSubmit={handleVerify} className="space-y-4">
+          {/* Mobile Number - Required */}
           <div className="space-y-2">
-            <Label htmlFor="mobile">Mobile Number</Label>
+            <Label htmlFor="mobile">Mobile Number *</Label>
             <Input
               id="mobile"
               type="tel"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
-              placeholder="Enter your mobile number"
+              placeholder="Enter 10-digit mobile number"
               required
+              maxLength={10}
+              pattern="\d{10}"
             />
           </div>
 
+          {/* Verify Mode Toggle */}
+          <div className="flex gap-2 mb-4">
+            <Button
+              type="button"
+              variant={verifyMode === 'identifier' ? 'default' : 'outline'}
+              onClick={() => setVerifyMode('identifier')}
+              className="flex-1 text-sm"
+              size="sm"
+            >
+              Use Confirmation/App Number
+            </Button>
+            <Button
+              type="button"
+              variant={verifyMode === 'name' ? 'default' : 'outline'}
+              onClick={() => setVerifyMode('name')}
+              className="flex-1 text-sm"
+              size="sm"
+            >
+              Use Name
+            </Button>
+          </div>
+
+          {/* Conditional Fields */}
+          {verifyMode === 'identifier' ? (
+            <div className="space-y-2">
+              <Label htmlFor="identifier">Confirmation / Application Number *</Label>
+              <Input
+                id="identifier"
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
+                placeholder="e.g., YC-0202 or YC/GSYB/0202"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter your confirmation number (YC-0202) or application number (YC/GSYB/0202)
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name *</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value.toUpperCase())}
+                placeholder="Enter your full name"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter your name as registered (e.g., RAJESH KAKKAD)
+              </p>
+            </div>
+          )}
+
+          {/* Info Box */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2">
+            <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-blue-900">
+              <p className="font-medium mb-1">Having trouble?</p>
+              <ul className="list-disc list-inside space-y-0.5 text-blue-800">
+                <li>Ensure mobile number matches your registration</li>
+                <li>Use the confirmation number from your confirmation email/SMS</li>
+                <li>Or try searching by name instead</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Error Message */}
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
               {error}
             </div>
           )}
 
-          <Button type="submit" disabled={isSearching} className="w-full">
-            {isSearching ? (
+          {/* Submit Button */}
+          <Button type="submit" disabled={isVerifying} className="w-full">
+            {isVerifying ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Searching...
+                Verifying...
               </>
             ) : (
               <>
                 <Search className="mr-2 h-4 w-4" />
-                Find My Details
+                Verify & Access QR Code
               </>
             )}
           </Button>
         </form>
+
+        {/* Footer Note */}
+        <div className="mt-4 pt-4 border-t">
+          <p className="text-xs text-center text-muted-foreground">
+            Your details are already registered. This portal is for downloading your QR code and ID card.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
 }
-

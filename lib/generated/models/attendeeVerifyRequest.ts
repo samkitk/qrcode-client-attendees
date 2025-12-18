@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VerifyAttendeeDto {
+export interface AttendeeVerifyRequest {
   /** Mobile number (10 digits) */
   mobile: string;
   /** Confirmation number OR application number */

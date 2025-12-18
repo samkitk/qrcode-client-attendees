@@ -6,11 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VerifyAttendeeDto {
-  /** Mobile number (10 digits) */
-  mobile: string;
-  /** Confirmation number OR application number */
-  identifier?: string;
-  /** Attendee full name (for search) */
-  name?: string;
-}
+/**
+ * Error details (optional)
+ */
+export type ErrorResponseError = { [key: string]: unknown };

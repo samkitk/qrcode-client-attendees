@@ -11,7 +11,8 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getAudit = () => {
   /**
-   * @summary Retrieve system activity logs
+   * Retrieve recent system activity audit logs (last 100 entries). Shows all actions including check-ins, QR downloads, user logins, overrides, and manual searches. Each log includes timestamp, action type, staff member who performed it, attendee details, and additional context. Requires JWT authentication. Used by: Staff Portal for audit trail and monitoring.
+   * @summary Get recent activity logs (Staff Portal - Admin)
    */
   const auditControllerFindAll = (
     options?: SecondParameter<typeof customInstance<void>>,
@@ -22,14 +23,18 @@ export const getAudit = () => {
     );
   };
   /**
-   * @summary Filter logs by specific action type
+   * Filter audit logs by specific action type. Available actions: check_in_attempt (successful QR scans), duplicate_scan (prevented re-scans), override_attempt (wrong person corrections), manual_search (manual check-ins, QR downloads, duplicate corrections), user_login, user_created, user_updated. Requires JWT authentication. Used by: Staff Portal for specific activity analysis.
+   * @summary Filter logs by action type (Staff Portal - Admin)
    */
   const auditControllerFindByAction = (
     action:
       | "check_in_attempt"
       | "duplicate_scan"
       | "override_attempt"
-      | "manual_search",
+      | "manual_search"
+      | "user_login"
+      | "user_created"
+      | "user_updated",
     options?: SecondParameter<typeof customInstance<void>>,
   ) => {
     return customInstance<void>(
@@ -38,7 +43,8 @@ export const getAudit = () => {
     );
   };
   /**
-   * @summary Get complete activity history for specific attendee
+   * Retrieve complete activity history for a specific attendee. Shows all interactions including QR code downloads, check-in attempts, manual searches, and any corrections made. Useful for tracking individual attendee journey and troubleshooting. Requires JWT authentication. Used by: Staff Portal for attendee history view.
+   * @summary Get attendee activity history (Staff Portal)
    */
   const auditControllerFindByAttendee = (
     attendeeId: string,

@@ -6,6 +6,9 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  CheckInResponseDto,
+  CheckInStatsDto,
+  DetailedStatsDto,
   ManualCheckInDto,
   OverrideCheckInDto,
   ScanCheckInDto,
@@ -17,14 +20,14 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getCheckIns = () => {
   /**
-   * Automatically tracks which staff member performed the check-in
-   * @summary Process QR code scan for attendance
+   * PRIMARY check-in method used at registration desk. Staff scans attendee QR code containing confirmation number. Validates QR code, prevents duplicate check-ins, and logs staff member who performed scan. This is the main flow for marking attendance. Requires JWT authentication. Used by: Staff Portal (Registration Desk).
+   * @summary Scan QR code for attendance (Staff Portal - PRIMARY METHOD)
    */
   const checkInsControllerScanCheckIn = (
     scanCheckInDto: ScanCheckInDto,
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<CheckInResponseDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<CheckInResponseDto>(
       {
         url: `/api/check-ins/scan`,
         method: "POST",
@@ -35,8 +38,8 @@ export const getCheckIns = () => {
     );
   };
   /**
-   * Automatically tracks which staff member performed the check-in
-   * @summary Manually check in attendee without QR code
+   * FALLBACK method when QR code is not working or attendee forgot ID card. Staff searches for attendee using search endpoint, then manually checks them in using attendee ID. Requires staff to provide reason for manual check-in. Logs staff member and reason in audit trail. Requires JWT authentication. Used by: Staff Portal when QR scan fails.
+   * @summary Manual check-in without QR code (Staff Portal - FALLBACK)
    */
   const checkInsControllerManualCheckIn = (
     manualCheckInDto: ManualCheckInDto,
@@ -53,8 +56,8 @@ export const getCheckIns = () => {
     );
   };
   /**
-   * Automatically tracks which staff member performed the override
-   * @summary Handle situations where wrong person's QR was scanned
+   * ERROR CORRECTION method when wrong person was checked in by mistake (e.g., attendee showed their brother's QR code). Removes incorrect check-in and creates correct one. Requires both scanned confirmation number and actual confirmation number. Logs complete override action including staff member and reason in audit trail. Requires JWT authentication. Used by: Staff Portal to fix errors.
+   * @summary Override wrong person check-in (Staff Portal - ERROR CORRECTION)
    */
   const checkInsControllerOverrideCheckIn = (
     overrideCheckInDto: OverrideCheckInDto,
@@ -71,29 +74,32 @@ export const getCheckIns = () => {
     );
   };
   /**
-   * @summary Real-time attendance dashboard data
+   * Real-time attendance statistics for dashboard. Shows total registered, checked in, pending, check-in rate, and breakdown by coach/trainer. Updates in real-time as staff scan QR codes. Requires JWT authentication. Used by: Staff Portal dashboard and analytics panel.
+   * @summary Real-time attendance dashboard stats (Staff Portal)
    */
   const checkInsControllerGetStats = (
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<CheckInStatsDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<CheckInStatsDto>(
       { url: `/api/check-ins/stats`, method: "GET" },
       options,
     );
   };
   /**
-   * @summary Detailed analytics by geography
+   * Detailed attendance analytics broken down by district and taluka. Shows check-in rates, totals, and pending counts for each geographic region. Used for insights and reporting. Requires JWT authentication. Used by: Staff Portal admin analytics and reporting.
+   * @summary Detailed geographic analytics (Staff Portal - Admin)
    */
   const checkInsControllerGetDetailedStats = (
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<DetailedStatsDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<DetailedStatsDto>(
       { url: `/api/check-ins/stats/detailed`, method: "GET" },
       options,
     );
   };
   /**
-   * @summary Export complete check-in data
+   * Export complete check-in data for reporting and analysis. Returns all check-in records with attendee details, timestamps, staff who performed check-in, and method used. Can be used for CSV export. Requires JWT authentication. Used by: Staff Portal for data export and reporting.
+   * @summary Export all check-ins (Staff Portal - Admin)
    */
   const checkInsControllerFindAll = (
     options?: SecondParameter<typeof customInstance<void>>,
@@ -104,7 +110,8 @@ export const getCheckIns = () => {
     );
   };
   /**
-   * @summary Get detailed information about specific check-in
+   * Retrieve complete details of a specific check-in record including attendee info, timestamp, method used, staff who performed it, and any related audit entries. Requires JWT authentication. Used by: Staff Portal for detailed check-in view.
+   * @summary Get specific check-in details (Staff Portal)
    */
   const checkInsControllerFindOne = (
     id: string,

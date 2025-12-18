@@ -11,7 +11,8 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getUsers = () => {
   /**
-   * @summary Get all staff members (Super Admin only)
+   * Retrieve list of all staff members and admins in the system. Shows usernames, emails, roles, active status, and last login times. ONLY accessible by super_admin role. Requires JWT authentication with super_admin role. Used by: Staff Portal admin panel for user management.
+   * @summary List all staff members (Super Admin only)
    */
   const usersControllerFindAll = (
     options?: SecondParameter<typeof customInstance<void>>,
@@ -19,7 +20,8 @@ export const getUsers = () => {
     return customInstance<void>({ url: `/api/users`, method: "GET" }, options);
   };
   /**
-   * @summary Get user by ID
+   * Retrieve detailed information about a specific staff member including username, email, role, active status, last login time, and creation details. Requires JWT authentication. Used by: Staff Portal for staff member profile view.
+   * @summary Get staff member details (Staff Portal)
    */
   const usersControllerFindOne = (
     id: string,

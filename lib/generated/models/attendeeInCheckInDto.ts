@@ -6,11 +6,15 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VerifyAttendeeDto {
-  /** Mobile number (10 digits) */
+export interface AttendeeInCheckInDto {
+  /** Attendee ID */
+  id: string;
+  /** Full name */
+  fullName: string;
+  /** Confirmation number */
+  confirmationNumber: string;
+  /** Mobile number */
   mobile: string;
-  /** Confirmation number OR application number */
-  identifier?: string;
-  /** Attendee full name (for search) */
-  name?: string;
+  /** District */
+  district: string;
 }

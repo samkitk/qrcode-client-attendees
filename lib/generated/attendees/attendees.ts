@@ -8,7 +8,9 @@
 import type {
   AttendeesControllerSearchParams,
   CreateAttendeeDto,
+  GenerateQRCodeResponseDto,
   VerifyAttendeeDto,
+  VerifyAttendeeResponseDto,
 } from ".././models";
 
 import { customInstance } from "../../api-mutator";
@@ -17,7 +19,8 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getAttendees = () => {
   /**
-   * @summary Create a new attendee registration
+   * Protected endpoint to manually create a new attendee registration. NOT USED in production as attendee data is pre-loaded from CSV. Provided for completeness and future use. Requires JWT authentication. Enforces unique constraints on mobile, application number, and confirmation number.
+   * @summary Create new attendee (Staff Portal - Not used in production)
    */
   const attendeesControllerCreate = (
     createAttendeeDto: CreateAttendeeDto,
@@ -34,7 +37,8 @@ export const getAttendees = () => {
     );
   };
   /**
-   * @summary Retrieve all registered attendees
+   * Protected endpoint to retrieve all registered attendees with their check-in status. Returns complete list of coaches and trainers. Requires JWT authentication. Used by: Staff Portal for attendee management and reporting.
+   * @summary List all registered attendees (Staff Portal)
    */
   const attendeesControllerFindAll = (
     options?: SecondParameter<typeof customInstance<void>>,
@@ -45,7 +49,8 @@ export const getAttendees = () => {
     );
   };
   /**
-   * @summary Import multiple attendees at once
+   * Protected endpoint to import multiple attendees at once. NOT USED in production as bulk import is done via CSV scripts. Returns success/failure report for each record. Requires JWT authentication.
+   * @summary Bulk import attendees (Staff Portal - Not used in production)
    */
   const attendeesControllerBulkCreate = (
     attendeesControllerBulkCreateBody: string[],
@@ -62,14 +67,14 @@ export const getAttendees = () => {
     );
   };
   /**
-   * Public endpoint for attendees to verify themselves
-   * @summary Verify attendee credentials before QR generation (Public)
+   * PUBLIC endpoint for coaches/trainers/attendees to verify their identity before downloading QR code. Accepts mobile number + confirmation number OR mobile + application number. Handles duplicate confirmation numbers by auto-correcting (YT/YC prefixes). Returns attendee details including check-in status. NO authentication required. Used by: Attendees Portal.
+   * @summary Verify attendee credentials (Public - Attendees Portal)
    */
   const attendeesControllerVerify = (
     verifyAttendeeDto: VerifyAttendeeDto,
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<VerifyAttendeeResponseDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<VerifyAttendeeResponseDto>(
       {
         url: `/api/attendees/verify`,
         method: "POST",
@@ -80,20 +85,21 @@ export const getAttendees = () => {
     );
   };
   /**
-   * Public endpoint for attendees to download their QR code. Logs download in audit trail.
-   * @summary Generate QR code for verified attendee (Public)
+   * PUBLIC endpoint for attendees to download their unique QR code and ID card data after verification. QR code contains confirmation number for scanning at registration desk. Automatically resolves duplicate confirmation numbers (YT/YC prefixing). Logs download in audit trail with IP and user agent. NO authentication required. Used by: Attendees Portal for ID card generation.
+   * @summary Generate and download QR code (Public - Attendees Portal)
    */
   const attendeesControllerGenerateQRCode = (
     id: string,
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<GenerateQRCodeResponseDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<GenerateQRCodeResponseDto>(
       { url: `/api/attendees/${id}/qr-code`, method: "GET" },
       options,
     );
   };
   /**
-   * @summary Search attendees for manual check-in
+   * Protected endpoint for staff to search registered attendees when QR code is not working. Search by name, mobile, confirmation number, or application number. Filter by district/taluka. Returns matching attendees with current check-in status. Requires JWT authentication. Used by: Staff Portal for manual check-in flow.
+   * @summary Search attendees for manual check-in (Staff Portal)
    */
   const attendeesControllerSearch = (
     params?: AttendeesControllerSearchParams,
@@ -105,7 +111,8 @@ export const getAttendees = () => {
     );
   };
   /**
-   * @summary Get single attendee details with check-in history
+   * Protected endpoint to retrieve complete details of a specific attendee including check-in history and audit trail. Requires JWT authentication. Used by: Staff Portal for detailed attendee view.
+   * @summary Get attendee details with check-in history (Staff Portal)
    */
   const attendeesControllerFindOne = (
     id: string,

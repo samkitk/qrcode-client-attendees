@@ -1,30 +1,9 @@
-import QRCode from 'qrcode';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Attendee } from './api';
-
-/**
- * Generate QR code as data URL
- */
-export const generateQRCodeDataURL = async (data: string): Promise<string> => {
-  try {
-    const qrCodeDataURL = await QRCode.toDataURL(data, {
-      width: 300,
-      margin: 2,
-      color: {
-        dark: '#000000',
-        light: '#FFFFFF',
-      },
-    });
-    return qrCodeDataURL;
-  } catch (error) {
-    console.error('Error generating QR code:', error);
-    throw error;
-  }
-};
 
 /**
  * Download QR code as PNG image
+ * QR code is provided by backend as data URL
  */
 export const downloadQRCode = (dataURL: string, filename: string = 'qrcode.png') => {
   const link = document.createElement('a');
@@ -99,17 +78,3 @@ export const downloadIDCardAsPDF = async (elementId: string, filename: string = 
     throw error;
   }
 };
-
-/**
- * Create QR code data string from attendee info
- */
-export const createQRData = (attendee: Attendee): string => {
-  return JSON.stringify({
-    id: attendee.id,
-    name: attendee.name,
-    mobile: attendee.mobile,
-    email: attendee.email,
-    organization: attendee.organization,
-  });
-};
-

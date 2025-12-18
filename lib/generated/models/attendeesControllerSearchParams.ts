@@ -9,19 +9,19 @@ import type { AttendeesControllerSearchField } from "./attendeesControllerSearch
 
 export type AttendeesControllerSearchParams = {
   /**
-   * Search text
+   * Search text - partial match on name, mobile, confirmation or application number
    */
   query?: string;
   /**
-   * Specific field to search
+   * Specific field to search in (optional - searches all if not specified)
    */
   field?: AttendeesControllerSearchField;
   /**
-   * Filter by district
+   * Filter results by district
    */
   district?: string;
   /**
-   * Filter by taluka
+   * Filter results by taluka
    */
   taluka?: string;
 };

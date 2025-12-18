@@ -5,7 +5,13 @@
  * API for managing event attendance through QR codes with multiple check-in methods, staff authentication, and RBAC
  * OpenAPI spec version: 1.0
  */
-import type { LoginDto, RegisterDto } from ".././models";
+import type {
+  CurrentUserResponseDto,
+  LoginDto,
+  LoginResponseDto,
+  RegisterDto,
+  RegisterResponseDto,
+} from ".././models";
 
 import { customInstance } from "../../api-mutator";
 
@@ -13,13 +19,14 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getAuthentication = () => {
   /**
-   * @summary Staff login
+   * Public endpoint for staff portal. Authenticates staff members and super admins using username/email and password. Returns JWT token for subsequent authenticated requests. Used by: Staff Portal.
+   * @summary Staff login - Authenticate staff members and admins
    */
   const authControllerLogin = (
     loginDto: LoginDto,
-    options?: SecondParameter<typeof customInstance<unknown>>,
+    options?: SecondParameter<typeof customInstance<LoginResponseDto>>,
   ) => {
-    return customInstance<unknown>(
+    return customInstance<LoginResponseDto>(
       {
         url: `/api/auth/login`,
         method: "POST",
@@ -30,13 +37,14 @@ export const getAuthentication = () => {
     );
   };
   /**
+   * Protected endpoint for super admins to create new staff accounts. Creates staff member or admin accounts with role assignment. Requires JWT authentication with super_admin role. Logs creation in audit trail. Used by: Staff Portal (Admin Panel).
    * @summary Register new staff member (Super Admin only)
    */
   const authControllerRegister = (
     registerDto: RegisterDto,
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<RegisterResponseDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<RegisterResponseDto>(
       {
         url: `/api/auth/register`,
         method: "POST",
@@ -47,12 +55,13 @@ export const getAuthentication = () => {
     );
   };
   /**
-   * @summary Get current user profile
+   * Protected endpoint that returns the profile of the currently authenticated staff member. Requires JWT authentication. Used by: Staff Portal to display user info.
+   * @summary Get current logged-in staff profile
    */
   const authControllerGetProfile = (
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<CurrentUserResponseDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<CurrentUserResponseDto>(
       { url: `/api/auth/me`, method: "GET" },
       options,
     );

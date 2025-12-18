@@ -6,11 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VerifyAttendeeDto {
-  /** Mobile number (10 digits) */
-  mobile: string;
-  /** Confirmation number OR application number */
-  identifier?: string;
-  /** Attendee full name (for search) */
-  name?: string;
-}
+/**
+ * User role
+ */
+export type UserDtoRole = (typeof UserDtoRole)[keyof typeof UserDtoRole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserDtoRole = {
+  super_admin: "super_admin",
+  staff: "staff",
+} as const;

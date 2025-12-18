@@ -6,11 +6,9 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VerifyAttendeeDto {
-  /** Mobile number (10 digits) */
-  mobile: string;
-  /** Confirmation number OR application number */
-  identifier?: string;
-  /** Attendee full name (for search) */
-  name?: string;
+export interface DetailedStatsDto {
+  /** Statistics by district */
+  byDistrict: string[];
+  /** Statistics by taluka */
+  byTaluka: string[];
 }

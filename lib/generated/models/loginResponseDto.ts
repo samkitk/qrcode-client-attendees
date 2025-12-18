@@ -5,12 +5,11 @@
  * API for managing event attendance through QR codes with multiple check-in methods, staff authentication, and RBAC
  * OpenAPI spec version: 1.0
  */
+import type { UserDto } from "./userDto";
 
-export interface VerifyAttendeeDto {
-  /** Mobile number (10 digits) */
-  mobile: string;
-  /** Confirmation number OR application number */
-  identifier?: string;
-  /** Attendee full name (for search) */
-  name?: string;
+export interface LoginResponseDto {
+  /** JWT access token */
+  access_token: string;
+  /** Authenticated user details */
+  user: UserDto;
 }
