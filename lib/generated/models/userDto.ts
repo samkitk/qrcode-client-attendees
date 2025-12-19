@@ -8,16 +8,30 @@
 import type { UserDtoRole } from "./userDtoRole";
 
 export interface UserDto {
-  /** User ID */
+  /** Unique user ID */
   id: string;
-  /** Username */
-  username: string;
-  /** Email address */
+  /** User email address */
   email: string;
-  /** Full name */
-  fullName?: string;
+  /** Username for login */
+  username: string;
+  /** Full name of the user */
+  fullName: string;
   /** User role */
   role: UserDtoRole;
-  /** Whether account is active */
-  isActive?: boolean;
+  /** Whether the user account is active */
+  isActive: boolean;
+  /**
+   * Last login timestamp
+   * @nullable
+   */
+  lastLogin: string | null;
+  /** Account creation timestamp */
+  createdAt: string;
+  /** Last update timestamp */
+  updatedAt: string;
+  /**
+   * ID of the user who created this account
+   * @nullable
+   */
+  createdBy: string | null;
 }

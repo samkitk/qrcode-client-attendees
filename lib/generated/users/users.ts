@@ -5,6 +5,8 @@
  * API for managing event attendance through QR codes with multiple check-in methods, staff authentication, and RBAC
  * OpenAPI spec version: 1.0
  */
+import type { UserDto } from ".././models";
+
 import { customInstance } from "../../api-mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -15,9 +17,12 @@ export const getUsers = () => {
    * @summary List all staff members (Super Admin only)
    */
   const usersControllerFindAll = (
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<UserDto[]>>,
   ) => {
-    return customInstance<void>({ url: `/api/users`, method: "GET" }, options);
+    return customInstance<UserDto[]>(
+      { url: `/api/users`, method: "GET" },
+      options,
+    );
   };
   /**
    * Retrieve detailed information about a specific staff member including username, email, role, active status, last login time, and creation details. Requires JWT authentication. Used by: Staff Portal for staff member profile view.
@@ -25,9 +30,9 @@ export const getUsers = () => {
    */
   const usersControllerFindOne = (
     id: string,
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<UserDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<UserDto>(
       { url: `/api/users/${id}`, method: "GET" },
       options,
     );
