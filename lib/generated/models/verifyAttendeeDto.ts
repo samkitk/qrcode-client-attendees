@@ -7,10 +7,6 @@
  */
 
 export interface VerifyAttendeeDto {
-  /** Mobile number (10 digits) */
-  mobile: string;
-  /** Confirmation number OR application number */
-  identifier?: string;
-  /** Attendee full name (for search) */
-  name?: string;
+  /** Mobile number OR Confirmation Code */
+  query: string;
 }

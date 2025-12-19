@@ -43,9 +43,9 @@ export const getCheckIns = () => {
    */
   const checkInsControllerManualCheckIn = (
     manualCheckInDto: ManualCheckInDto,
-    options?: SecondParameter<typeof customInstance<void>>,
+    options?: SecondParameter<typeof customInstance<CheckInResponseDto>>,
   ) => {
-    return customInstance<void>(
+    return customInstance<CheckInResponseDto>(
       {
         url: `/api/check-ins/manual`,
         method: "POST",

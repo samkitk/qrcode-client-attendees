@@ -34,4 +34,6 @@ export interface AttendeeBasicDto {
   eventDate?: string;
   /** Event venue */
   venue?: string;
+  /** Registration timestamp */
+  timestamp?: string;
 }

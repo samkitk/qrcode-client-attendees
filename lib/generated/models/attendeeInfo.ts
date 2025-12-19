@@ -34,4 +34,6 @@ export interface AttendeeInfo {
   eventDate?: string;
   /** Event venue */
   venue?: string;
+  /** Registration timestamp */
+  timestamp?: string;
 }

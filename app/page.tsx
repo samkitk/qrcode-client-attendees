@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const [currentAttendee, setCurrentAttendee] = useState<Attendee | null>(null);
+  const [attendeeList, setAttendeeList] = useState<Attendee[]>([]);
   const [qrCodeURL, setQrCodeURL] = useState<string>('');
   const [isLoadingQR, setIsLoadingQR] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -19,30 +20,45 @@ export default function Home() {
   const [correctionMessage, setCorrectionMessage] = useState<string>('');
   const [qrError, setQrError] = useState('');
 
-  const handleAttendeeVerified = async (attendee: Attendee, qrCodeData?: any) => {
-    setCurrentAttendee(attendee);
+  const handleAttendeeVerified = async (_: any, response: any) => {
     setCorrectionMessage('');
     setShowIDCard(false);
     setQrError('');
+    setAttendeeList([]);
+    setCurrentAttendee(null);
 
-    // If QR code data is provided directly, use it
-    if (qrCodeData) {
-      setQrCodeURL(qrCodeData.qrCode);
-    } else {
-      // Otherwise fetch from backend (fallback for old flow)
-      await fetchQRCode(attendee.id);
+    // Check if the response matches new format with array
+    if (response.attendees && Array.isArray(response.attendees)) {
+      if (response.attendees.length === 1) {
+        // Only one match, auto-select
+        selectAttendee(response.attendees[0]);
+      } else if (response.attendees.length > 1) {
+        // Multiple matches, show list
+        setAttendeeList(response.attendees);
+      } else {
+        // Should be caught by catch block in form, but just in case
+        console.error('No attendees found in successful response');
+      }
+    } else if (response.attendee) {
+      // Fallback for old/single response structure
+      selectAttendee(response.attendee);
     }
+  };
+
+  const selectAttendee = async (attendee: Attendee) => {
+    setCurrentAttendee(attendee);
+    setAttendeeList([]); // Clear list to show details view
+    await fetchQRCode(attendee.id);
   };
 
   const fetchQRCode = async (attendeeId: string) => {
     setIsLoadingQR(true);
     setQrError('');
-    
+
     try {
       const response = await attendeeApi.getQRCode(attendeeId);
       setQrCodeURL(response.qrCode);
-      
-      // Update attendee data with latest from QR endpoint (in case backend updated it)
+
       if (response.attendee) {
         setCurrentAttendee(response.attendee);
       }
@@ -60,20 +76,21 @@ export default function Home() {
     setShowIDCard(false);
     setCorrectionMessage('');
     setQrError('');
+    // If we had a list, clearing currentAttendee will show the form again.
+    // To go back to list, we would need more state, but going back to form is safer.
+    setAttendeeList([]);
   };
 
   const handleDownloadIDCard = async (format: 'png' | 'pdf' | 'preview' = 'preview') => {
     if (!currentAttendee || !qrCodeURL) return;
-    
-    // Show preview
+
     if (format === 'preview') {
       setShowIDCard(true);
       return;
     }
 
     setIsDownloading(true);
-    
-    // Ensure card is rendered
+
     if (!showIDCard) {
       setShowIDCard(true);
       await new Promise(resolve => setTimeout(resolve, 200));
@@ -81,7 +98,7 @@ export default function Home() {
 
     try {
       const filename = `event-id-card-${currentAttendee.fullName.replace(/\s+/g, '-')}-${currentAttendee.confirmationNumber}`;
-      
+
       if (format === 'png') {
         await downloadIDCard('id-card-container', `${filename}.png`);
       } else if (format === 'pdf') {
@@ -109,7 +126,7 @@ export default function Home() {
               Event Attendee Portal
             </h1>
             <p className="text-gray-600 mt-2 text-sm md:text-base">
-              Enter your name and mobile number to download your event QR code & ID card
+              Enter your mobile number or code to download your event QR code & ID card
             </p>
           </div>
         </div>
@@ -118,20 +135,49 @@ export default function Home() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="flex flex-col items-center justify-center">
-          {/* Correction Message */}
-          {correctionMessage && currentAttendee && (
-            <div className="mb-6 w-full max-w-4xl bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-yellow-900">Duplicate Confirmation Number Detected</p>
-                  <p className="text-sm text-yellow-800 mt-1">{correctionMessage}</p>
+          {/* Multiple Attendees List Selection */}
+          {attendeeList.length > 0 && !currentAttendee ? (
+            <div className="w-full max-w-2xl">
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border">
+                <div className="bg-blue-50 p-4 border-b border-blue-100">
+                  <h2 className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5" />
+                    Multiple Registrations Found
+                  </h2>
+                  <p className="text-sm text-blue-700 mt-1">
+                    We found multiple registrations for your number. Please select the corect one.
+                  </p>
+                </div>
+                <div className="divide-y">
+                  {attendeeList.map((attendee) => (
+                    <button
+                      key={attendee.id}
+                      onClick={() => selectAttendee(attendee)}
+                      className="w-full text-left p-4 hover:bg-gray-50 transition-colors flex justify-between items-center group"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900">{attendee.fullName}</p>
+                        <p className="text-sm text-gray-500">
+                          {attendee.confirmationNumber} • {attendee.role || 'Attendee'}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Registered: {new Date(attendee.timestamp || Date.now()).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Select →
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="p-4 bg-gray-50 border-t">
+                  <Button variant="outline" onClick={() => setAttendeeList([])} className="w-full">
+                    Cancel / Search Again
+                  </Button>
                 </div>
               </div>
             </div>
-          )}
-
-          {!currentAttendee ? (
+          ) : !currentAttendee ? (
             <AttendeeForm onAttendeeVerified={handleAttendeeVerified} />
           ) : (
             <AttendeeDetails
@@ -215,9 +261,6 @@ export default function Home() {
         <div className="container mx-auto px-4 py-6 text-center">
           <p className="text-sm text-gray-600">
             © {new Date().getFullYear()} Event Management System. All rights reserved.
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            For support, contact the registration desk
           </p>
         </div>
       </footer>

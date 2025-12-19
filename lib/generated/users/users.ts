@@ -5,13 +5,30 @@
  * API for managing event attendance through QR codes with multiple check-in methods, staff authentication, and RBAC
  * OpenAPI spec version: 1.0
  */
-import type { UserDto } from ".././models";
+import type { RegisterDto, UserDto } from ".././models";
 
 import { customInstance } from "../../api-mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getUsers = () => {
+  /**
+   * @summary Create a new user (Super Admin only)
+   */
+  const usersControllerCreate = (
+    registerDto: RegisterDto,
+    options?: SecondParameter<typeof customInstance<UserDto>>,
+  ) => {
+    return customInstance<UserDto>(
+      {
+        url: `/api/users`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: registerDto,
+      },
+      options,
+    );
+  };
   /**
    * Retrieve list of all staff members and admins in the system. Shows usernames, emails, roles, active status, and last login times. ONLY accessible by super_admin role. Requires JWT authentication with super_admin role. Used by: Staff Portal admin panel for user management.
    * @summary List all staff members (Super Admin only)
@@ -21,6 +38,18 @@ export const getUsers = () => {
   ) => {
     return customInstance<UserDto[]>(
       { url: `/api/users`, method: "GET" },
+      options,
+    );
+  };
+  /**
+   * @summary Delete a user (Super Admin only)
+   */
+  const usersControllerDelete = (
+    id: string,
+    options?: SecondParameter<typeof customInstance<void>>,
+  ) => {
+    return customInstance<void>(
+      { url: `/api/users/${id}`, method: "DELETE" },
       options,
     );
   };
@@ -37,10 +66,21 @@ export const getUsers = () => {
       options,
     );
   };
-  return { usersControllerFindAll, usersControllerFindOne };
+  return {
+    usersControllerCreate,
+    usersControllerFindAll,
+    usersControllerDelete,
+    usersControllerFindOne,
+  };
 };
+export type UsersControllerCreateResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getUsers>["usersControllerCreate"]>>
+>;
 export type UsersControllerFindAllResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getUsers>["usersControllerFindAll"]>>
+>;
+export type UsersControllerDeleteResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getUsers>["usersControllerDelete"]>>
 >;
 export type UsersControllerFindOneResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getUsers>["usersControllerFindOne"]>>

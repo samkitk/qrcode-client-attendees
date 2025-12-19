@@ -10,8 +10,10 @@ import type { AttendeeBasicDto } from "./attendeeBasicDto";
 export interface AttendeeVerifyResponse {
   /** Operation success status */
   success: boolean;
+  /** Number of attendees found */
+  count: number;
   /** Verified attendee details */
-  attendee: AttendeeBasicDto;
+  attendees: AttendeeBasicDto[];
   /** Whether confirmation number was auto-corrected due to duplicate */
   corrected?: boolean;
   /** Message about the verification (e.g., correction details) */

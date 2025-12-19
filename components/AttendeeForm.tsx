@@ -13,21 +13,15 @@ interface AttendeeFormProps {
 }
 
 export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) {
-  const [mobile, setMobile] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [query, setQuery] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleDownload = async (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!fullName.trim()) {
-      setError('Please enter your full name');
-      return;
-    }
-
-    if (!mobile.trim()) {
-      setError('Please enter your mobile number');
+    if (!query.trim()) {
+      setError('Please enter your mobile number or confirmation code');
       return;
     }
 
@@ -35,23 +29,20 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
     setError('');
 
     try {
-      // Download by name and mobile combination only
-      const response = await attendeeApi.getQRCodeByNameAndMobile(
-        fullName.trim(),
-        mobile.trim()
-      );
+      // Use the verify endpoint which now supports searching by mobile OR confirmation code
+      const response = await attendeeApi.verify({
+        query: query.trim()
+      });
 
-      // Create a synthetic attendee object for the UI
-      const attendee: Attendee = response.attendee;
-
-      onAttendeeVerified(attendee, response);
+      // Pass the whole response (which contains 'attendees' array) to the parent
+      onAttendeeVerified(null as any, response);
     } catch (err: any) {
-      console.error('Error downloading QR code:', err);
+      console.error('Error verifying attendee:', err);
 
-      if (err.response?.status === 404) {
-        setError('No attendee found with this name and mobile combination. Please check your details and try again.');
+      if (err.status === 404 || err.response?.status === 404) {
+        setError('No attendee found with these details. Please check and try again.');
       } else {
-        setError(err.message || 'Failed to download QR code. Please try again.');
+        setError(err.message || 'Failed to verify. Please try again.');
       }
     } finally {
       setIsDownloading(false);
@@ -66,42 +57,24 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
           Download QR Code & ID Card
         </CardTitle>
         <CardDescription>
-          Enter your name and mobile number to download your event QR code and ID card
+          Enter your Mobile Number OR Confirmation Code to search
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleDownload} className="space-y-4">
-          {/* Full Name */}
+        <form onSubmit={handleVerify} className="space-y-4">
+          {/* Mobile or Confirmation Code */}
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name *</Label>
+            <Label htmlFor="query">Mobile Number or Confirmation Code *</Label>
             <Input
-              id="fullName"
+              id="query"
               type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value.toUpperCase())}
-              placeholder="Enter your full name in English"
+              value={query}
+              onChange={(e) => setQuery(e.target.value.toUpperCase())}
+              placeholder="e.g. 9876543210 or YC-0202"
               required
             />
             <p className="text-xs text-muted-foreground">
-              Enter your name as registered (e.g., RAJESH KAKKAD)
-            </p>
-          </div>
-
-          {/* Mobile Number */}
-          <div className="space-y-2">
-            <Label htmlFor="mobile">Mobile Number *</Label>
-            <Input
-              id="mobile"
-              type="tel"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              placeholder="Enter 10-digit mobile number"
-              required
-              maxLength={10}
-              pattern="\d{10}"
-            />
-            <p className="text-xs text-muted-foreground">
-              Enter your registered mobile number
+              Enter either your registered mobile number OR your confirmation code
             </p>
           </div>
 
@@ -111,9 +84,9 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
             <div className="text-xs text-blue-900">
               <p className="font-medium mb-1">How to download:</p>
               <ul className="list-disc list-inside space-y-0.5 text-blue-800">
-                <li>Enter your full name in English exactly as registered</li>
-                <li>Enter your 10-digit mobile number</li>
-                <li>Click "Download QR Code & ID Card"</li>
+                <li>Enter your 10-digit mobile number OR</li>
+                <li>Enter your Confirmation Code (e.g. YC-1234)</li>
+                <li>Click "Search & Download" button</li>
               </ul>
             </div>
           </div>
@@ -130,12 +103,12 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
             {isDownloading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Downloading...
+                Searching...
               </>
             ) : (
               <>
                 <Search className="mr-2 h-4 w-4" />
-                Download QR Code & ID Card
+                Search & Download
               </>
             )}
           </Button>
@@ -144,7 +117,7 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
         {/* Footer Note */}
         <div className="mt-4 pt-4 border-t">
           <p className="text-xs text-center text-muted-foreground">
-            Your details are already registered. Enter your name and mobile number to download your QR code and ID card.
+            Your details are already registered. Enter your mobile number or confirmation code to search for your QR code and ID card.
           </p>
         </div>
       </CardContent>
