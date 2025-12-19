@@ -12,7 +12,6 @@ interface AttendeeDetailsProps {
   isLoadingQR: boolean;
   qrError: string;
   onBack: () => void;
-  onDownloadIDCard: () => void;
   onRetryQR: () => void;
 }
 
@@ -22,7 +21,6 @@ export default function AttendeeDetails({
   isLoadingQR,
   qrError,
   onBack,
-  onDownloadIDCard,
   onRetryQR
 }: AttendeeDetailsProps) {
   const handleDownloadQR = () => {
@@ -98,11 +96,10 @@ export default function AttendeeDetails({
                   <div>
                     <p className="text-sm text-muted-foreground">Role</p>
                     <p className="font-medium">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${
-                        attendee.role === 'COACH' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-purple-100 text-purple-800'
-                      }`}>
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${attendee.role === 'COACH'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-purple-100 text-purple-800'
+                        }`}>
                         {attendee.role}
                       </span>
                     </p>
@@ -207,55 +204,6 @@ export default function AttendeeDetails({
           </CardContent>
         </Card>
       </div>
-
-      {/* ID Card Download Section */}
-      <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-purple-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-900">
-            <Download className="h-5 w-5" />
-            Event ID Card
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-blue-200">
-            <p className="text-sm text-gray-700 mb-4">
-              Your personalized event ID card includes all your details and QR code for seamless event access.
-            </p>
-            <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
-              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>High-resolution QR code for scanning</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
-              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Professional design with event branding</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-600">
-              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Print-ready format (PNG & PDF)</span>
-            </div>
-          </div>
-          
-          <Button
-            onClick={onDownloadIDCard}
-            disabled={!qrCodeURL || isLoadingQR}
-            size="lg"
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-          >
-            <Download className="mr-2 h-5 w-5" />
-            Preview & Download ID Card
-          </Button>
-          
-          <p className="text-xs text-center text-gray-600">
-            Available formats: PNG (Image) • PDF (Document)
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -54,7 +54,7 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Search className="h-6 w-6" />
-          Download QR Code & ID Card
+          Download QR Code
         </CardTitle>
         <CardDescription>
           Enter your Mobile Number OR Confirmation Code to search
@@ -117,7 +117,7 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
         {/* Footer Note */}
         <div className="mt-4 pt-4 border-t">
           <p className="text-xs text-center text-muted-foreground">
-            Your details are already registered. Enter your mobile number or confirmation code to search for your QR code and ID card.
+            Your details are already registered. Enter your mobile number or confirmation code to search for your QR code.
           </p>
         </div>
       </CardContent>

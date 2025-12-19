@@ -3,11 +3,9 @@
 import { useState } from 'react';
 import AttendeeForm from '@/components/AttendeeForm';
 import AttendeeDetails from '@/components/AttendeeDetails';
-import IDCard from '@/components/IDCard';
 import { type Attendee } from '@/lib/api';
 import { attendeeApi } from '@/lib/api';
-import { downloadIDCard, downloadIDCardAsPDF } from '@/lib/qr-utils';
-import { Loader2, Download, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
@@ -15,14 +13,9 @@ export default function Home() {
   const [attendeeList, setAttendeeList] = useState<Attendee[]>([]);
   const [qrCodeURL, setQrCodeURL] = useState<string>('');
   const [isLoadingQR, setIsLoadingQR] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [showIDCard, setShowIDCard] = useState(false);
-  const [correctionMessage, setCorrectionMessage] = useState<string>('');
   const [qrError, setQrError] = useState('');
 
   const handleAttendeeVerified = async (_: any, response: any) => {
-    setCorrectionMessage('');
-    setShowIDCard(false);
     setQrError('');
     setAttendeeList([]);
     setCurrentAttendee(null);
@@ -73,47 +66,10 @@ export default function Home() {
   const handleBack = () => {
     setCurrentAttendee(null);
     setQrCodeURL('');
-    setShowIDCard(false);
-    setCorrectionMessage('');
     setQrError('');
     // If we had a list, clearing currentAttendee will show the form again.
     // To go back to list, we would need more state, but going back to form is safer.
     setAttendeeList([]);
-  };
-
-  const handleDownloadIDCard = async (format: 'png' | 'pdf' | 'preview' = 'preview') => {
-    if (!currentAttendee || !qrCodeURL) return;
-
-    if (format === 'preview') {
-      setShowIDCard(true);
-      return;
-    }
-
-    setIsDownloading(true);
-
-    if (!showIDCard) {
-      setShowIDCard(true);
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
-
-    try {
-      const filename = `event-id-card-${currentAttendee.fullName.replace(/\s+/g, '-')}-${currentAttendee.confirmationNumber}`;
-
-      if (format === 'png') {
-        await downloadIDCard('id-card-container', `${filename}.png`);
-      } else if (format === 'pdf') {
-        await downloadIDCardAsPDF('id-card-container', `${filename}.pdf`);
-      }
-    } catch (error) {
-      console.error('Error downloading ID card:', error);
-      alert('Failed to download ID card. Please try again.');
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const handleClosePreview = () => {
-    setShowIDCard(false);
   };
 
   return (
@@ -141,7 +97,7 @@ export default function Home() {
 
             {/* Subtitle */}
             <p className="text-gray-600 mt-2 text-sm md:text-base">
-              Enter your mobile number or code to download your event QR code & ID card
+              Enter your mobile number or code to download your event QR code
             </p>
           </div>
         </div>
@@ -201,72 +157,8 @@ export default function Home() {
               isLoadingQR={isLoadingQR}
               qrError={qrError}
               onBack={handleBack}
-              onDownloadIDCard={handleDownloadIDCard}
               onRetryQR={() => fetchQRCode(currentAttendee.id)}
             />
-          )}
-
-          {/* ID Card Preview/Download Modal */}
-          {showIDCard && currentAttendee && qrCodeURL && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-gray-50 rounded-2xl p-6 max-w-md w-full shadow-2xl">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Event ID Card Preview</h3>
-                  <button
-                    onClick={handleClosePreview}
-                    disabled={isDownloading}
-                    className="text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
-                    aria-label="Close preview"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="mb-4 flex justify-center">
-                  <IDCard attendee={currentAttendee} qrCodeURL={qrCodeURL} />
-                </div>
-
-                {isDownloading ? (
-                  <div className="flex items-center justify-center text-sm text-gray-600 py-3">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating ID card...
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 text-center mb-3">
-                      Choose your preferred download format
-                    </p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button
-                        onClick={() => handleDownloadIDCard('png')}
-                        className="w-full"
-                        variant="default"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        PNG Image
-                      </Button>
-                      <Button
-                        onClick={() => handleDownloadIDCard('pdf')}
-                        className="w-full"
-                        variant="secondary"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        PDF Document
-                      </Button>
-                    </div>
-                    <Button
-                      onClick={handleClosePreview}
-                      variant="outline"
-                      className="w-full mt-2"
-                    >
-                      Close Preview
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
           )}
         </div>
       </main>
