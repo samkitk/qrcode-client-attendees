@@ -117,14 +117,29 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
+      <header className="bg-white border-b-2 border-[#3F6EA7] shadow-md">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Event Attendee Portal
+          <div className="flex flex-col items-center text-center gap-4">
+            {/* Logo */}
+            <img
+              src="/logo-1.png"
+              alt="Gujarat State Yoga Board"
+              className="h-16 md:h-20 w-auto"
+            />
+
+            {/* Event Title - Gujarati */}
+            <h1 className="text-xl md:text-2xl font-bold text-[#3F6EA7]">
+              ગુજરાત રાજ્ય યોગ બોર્ડના યોગ કોચ અને યોગ ટ્રેનર્સની દીક્ષાંત સમારોહ અને વિશ્વ ધ્યાન દિવસની ઉજવણી
             </h1>
+
+            {/* Event Title - English */}
+            <h2 className="text-lg md:text-xl font-semibold text-[#3F6EA7]">
+              Convocation Ceremony of Yoga Coaches and Yoga Trainers of Gujarat State Yoga Board and Celebration of World Meditation Day
+            </h2>
+
+            {/* Subtitle */}
             <p className="text-gray-600 mt-2 text-sm md:text-base">
               Enter your mobile number or code to download your event QR code & ID card
             </p>
@@ -138,14 +153,14 @@ export default function Home() {
           {/* Multiple Attendees List Selection */}
           {attendeeList.length > 0 && !currentAttendee ? (
             <div className="w-full max-w-2xl">
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border">
-                <div className="bg-blue-50 p-4 border-b border-blue-100">
-                  <h2 className="text-lg font-semibold text-blue-900 flex items-center gap-2">
+              <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-[#3F6EA7]">
+                <div className="bg-[#3F6EA7] p-4 border-b border-blue-100">
+                  <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                     <AlertCircle className="h-5 w-5" />
                     Multiple Registrations Found
                   </h2>
-                  <p className="text-sm text-blue-700 mt-1">
-                    We found multiple registrations for your number. Please select the corect one.
+                  <p className="text-sm text-blue-50 mt-1">
+                    We found multiple registrations for your number. Please select the correct one.
                   </p>
                 </div>
                 <div className="divide-y">
@@ -153,7 +168,7 @@ export default function Home() {
                     <button
                       key={attendee.id}
                       onClick={() => selectAttendee(attendee)}
-                      className="w-full text-left p-4 hover:bg-gray-50 transition-colors flex justify-between items-center group"
+                      className="w-full text-left p-4 hover:bg-blue-50 transition-colors flex justify-between items-center group"
                     >
                       <div>
                         <p className="font-semibold text-gray-900">{attendee.fullName}</p>
@@ -164,7 +179,7 @@ export default function Home() {
                           Registered: {new Date(attendee.timestamp || Date.now()).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="text-[#3F6EA7] opacity-0 group-hover:opacity-100 transition-opacity">
                         Select →
                       </div>
                     </button>

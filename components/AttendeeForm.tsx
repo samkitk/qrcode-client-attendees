@@ -79,11 +79,11 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
           </div>
 
           {/* Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2">
-            <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-blue-900">
-              <p className="font-medium mb-1">How to download:</p>
-              <ul className="list-disc list-inside space-y-0.5 text-blue-800">
+          <div className="bg-blue-50 border-2 border-[#3F6EA7] rounded-lg p-3 flex gap-2">
+            <Info className="h-5 w-5 text-[#3F6EA7] flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-gray-800">
+              <p className="font-medium mb-1 text-[#3F6EA7]">How to download:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-gray-700">
                 <li>Enter your 10-digit mobile number OR</li>
                 <li>Enter your Confirmation Code (e.g. YC-XXX or YT-XXX)</li>
                 <li>Click "Search & Download" button</li>
