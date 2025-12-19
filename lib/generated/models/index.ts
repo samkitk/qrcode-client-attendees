@@ -13,6 +13,8 @@ export * from "./attendeeInfo";
 export * from "./attendeeInfoRole";
 export * from "./attendeeVerifyRequest";
 export * from "./attendeeVerifyResponse";
+export * from "./attendeesControllerGenerateQRCodeByConfirmationNumberBody";
+export * from "./attendeesControllerGenerateQRCodeByNameAndMobileBody";
 export * from "./attendeesControllerSearchField";
 export * from "./attendeesControllerSearchParams";
 export * from "./checkInDetailsDto";

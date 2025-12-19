@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  AttendeesControllerGenerateQRCodeByConfirmationNumberBody,
+  AttendeesControllerGenerateQRCodeByNameAndMobileBody,
   AttendeesControllerSearchParams,
   CreateAttendeeDto,
   GenerateQRCodeResponseDto,
@@ -102,10 +104,16 @@ export const getAttendees = () => {
    * @summary Download QR code by Confirmation Number (Public - Attendees Portal)
    */
   const attendeesControllerGenerateQRCodeByConfirmationNumber = (
+    attendeesControllerGenerateQRCodeByConfirmationNumberBody: AttendeesControllerGenerateQRCodeByConfirmationNumberBody,
     options?: SecondParameter<typeof customInstance<GenerateQRCodeResponseDto>>,
   ) => {
     return customInstance<GenerateQRCodeResponseDto>(
-      { url: `/api/attendees/qr-code/confirmation`, method: "POST" },
+      {
+        url: `/api/attendees/qr-code/confirmation`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: attendeesControllerGenerateQRCodeByConfirmationNumberBody,
+      },
       options,
     );
   };
@@ -114,10 +122,16 @@ export const getAttendees = () => {
    * @summary Download QR code by Name + Mobile (Public - Attendees Portal)
    */
   const attendeesControllerGenerateQRCodeByNameAndMobile = (
+    attendeesControllerGenerateQRCodeByNameAndMobileBody: AttendeesControllerGenerateQRCodeByNameAndMobileBody,
     options?: SecondParameter<typeof customInstance<GenerateQRCodeResponseDto>>,
   ) => {
     return customInstance<GenerateQRCodeResponseDto>(
-      { url: `/api/attendees/qr-code/name-mobile`, method: "POST" },
+      {
+        url: `/api/attendees/qr-code/name-mobile`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: attendeesControllerGenerateQRCodeByNameAndMobileBody,
+      },
       options,
     );
   };

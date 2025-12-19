@@ -28,14 +28,14 @@ export const attendeeApi = {
     const response = await api.attendeesControllerGenerateQRCodeByConfirmationNumber({
       confirmationNumber,
     });
-    return response.data;
+    return response;
   },
   getQRCodeByNameAndMobile: async (fullName: string, mobile: string) => {
     const response = await api.attendeesControllerGenerateQRCodeByNameAndMobile({
       fullName,
       mobile,
     });
-    return response.data;
+    return response;
   },
 };
 
