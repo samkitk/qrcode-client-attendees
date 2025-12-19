@@ -70,7 +70,7 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value.toUpperCase())}
-              placeholder="e.g. 9876543210 or YC-0202"
+              placeholder="e.g. 9876543210 or YC-XXX or YT-XXX"
               required
             />
             <p className="text-xs text-muted-foreground">
@@ -85,7 +85,7 @@ export default function AttendeeForm({ onAttendeeVerified }: AttendeeFormProps) 
               <p className="font-medium mb-1">How to download:</p>
               <ul className="list-disc list-inside space-y-0.5 text-blue-800">
                 <li>Enter your 10-digit mobile number OR</li>
-                <li>Enter your Confirmation Code (e.g. YC-1234)</li>
+                <li>Enter your Confirmation Code (e.g. YC-XXX or YT-XXX)</li>
                 <li>Click "Search & Download" button</li>
               </ul>
             </div>
