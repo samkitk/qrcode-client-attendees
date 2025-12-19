@@ -23,6 +23,20 @@ const api = getAttendees();
 export const attendeeApi = {
   verify: api.attendeesControllerVerify,
   getQRCode: api.attendeesControllerGenerateQRCode,
+  // New methods for the two download options
+  getQRCodeByConfirmationNumber: async (confirmationNumber: string) => {
+    const response = await api.attendeesControllerGenerateQRCodeByConfirmationNumber({
+      confirmationNumber,
+    });
+    return response.data;
+  },
+  getQRCodeByNameAndMobile: async (fullName: string, mobile: string) => {
+    const response = await api.attendeesControllerGenerateQRCodeByNameAndMobile({
+      fullName,
+      mobile,
+    });
+    return response.data;
+  },
 };
 
 // Also export the factory function if needed

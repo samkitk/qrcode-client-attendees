@@ -19,14 +19,19 @@ export default function Home() {
   const [correctionMessage, setCorrectionMessage] = useState<string>('');
   const [qrError, setQrError] = useState('');
 
-  const handleAttendeeVerified = async (attendee: Attendee, message?: string) => {
+  const handleAttendeeVerified = async (attendee: Attendee, qrCodeData?: any) => {
     setCurrentAttendee(attendee);
-    setCorrectionMessage(message || '');
+    setCorrectionMessage('');
     setShowIDCard(false);
     setQrError('');
-    
-    // Fetch QR code from backend
-    await fetchQRCode(attendee.id);
+
+    // If QR code data is provided directly, use it
+    if (qrCodeData) {
+      setQrCodeURL(qrCodeData.qrCode);
+    } else {
+      // Otherwise fetch from backend (fallback for old flow)
+      await fetchQRCode(attendee.id);
+    }
   };
 
   const fetchQRCode = async (attendeeId: string) => {
@@ -104,7 +109,7 @@ export default function Home() {
               Event Attendee Portal
             </h1>
             <p className="text-gray-600 mt-2 text-sm md:text-base">
-              Verify your credentials and download your event QR code & ID card
+              Enter your name and mobile number to download your event QR code & ID card
             </p>
           </div>
         </div>

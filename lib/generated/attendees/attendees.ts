@@ -98,6 +98,30 @@ export const getAttendees = () => {
     );
   };
   /**
+   * PUBLIC endpoint for attendees to download their QR code using their Registration Confirmation Number. This is one of the two supported download methods. NO authentication required. Used by: Attendees Portal.
+   * @summary Download QR code by Confirmation Number (Public - Attendees Portal)
+   */
+  const attendeesControllerGenerateQRCodeByConfirmationNumber = (
+    options?: SecondParameter<typeof customInstance<GenerateQRCodeResponseDto>>,
+  ) => {
+    return customInstance<GenerateQRCodeResponseDto>(
+      { url: `/api/attendees/qr-code/confirmation`, method: "POST" },
+      options,
+    );
+  };
+  /**
+   * PUBLIC endpoint for attendees to download their QR code using their full name and mobile number combination. This is one of the two supported download methods. NO authentication required. Used by: Attendees Portal.
+   * @summary Download QR code by Name + Mobile (Public - Attendees Portal)
+   */
+  const attendeesControllerGenerateQRCodeByNameAndMobile = (
+    options?: SecondParameter<typeof customInstance<GenerateQRCodeResponseDto>>,
+  ) => {
+    return customInstance<GenerateQRCodeResponseDto>(
+      { url: `/api/attendees/qr-code/name-mobile`, method: "POST" },
+      options,
+    );
+  };
+  /**
    * Protected endpoint for staff to search registered attendees when QR code is not working. Search by name, mobile, confirmation number, or application number. Filter by district/taluka. Returns matching attendees with current check-in status. Requires JWT authentication. Used by: Staff Portal for manual check-in flow.
    * @summary Search attendees for manual check-in (Staff Portal)
    */
@@ -129,6 +153,8 @@ export const getAttendees = () => {
     attendeesControllerBulkCreate,
     attendeesControllerVerify,
     attendeesControllerGenerateQRCode,
+    attendeesControllerGenerateQRCodeByConfirmationNumber,
+    attendeesControllerGenerateQRCodeByNameAndMobile,
     attendeesControllerSearch,
     attendeesControllerFindOne,
   };
@@ -160,6 +186,26 @@ export type AttendeesControllerGenerateQRCodeResult = NonNullable<
     >
   >
 >;
+export type AttendeesControllerGenerateQRCodeByConfirmationNumberResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getAttendees
+        >["attendeesControllerGenerateQRCodeByConfirmationNumber"]
+      >
+    >
+  >;
+export type AttendeesControllerGenerateQRCodeByNameAndMobileResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getAttendees
+        >["attendeesControllerGenerateQRCodeByNameAndMobile"]
+      >
+    >
+  >;
 export type AttendeesControllerSearchResult = NonNullable<
   Awaited<
     ReturnType<ReturnType<typeof getAttendees>["attendeesControllerSearch"]>

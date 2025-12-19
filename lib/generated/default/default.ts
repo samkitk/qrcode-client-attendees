@@ -15,5 +15,10 @@ export const getDefault = () => {
   ) => {
     return customInstance<void>({ url: `/`, method: "GET" }, options);
   };
+  const appControllerGetHealth = (
+    options?: SecondParameter<typeof customInstance<void>>,
+  ) => {
+    return customInstance<void>({ url: `/health`, method: "GET" }, options);
+  };
   return {};
 };

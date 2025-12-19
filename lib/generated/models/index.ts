@@ -21,6 +21,7 @@ export * from "./checkInResponseDto";
 export * from "./checkInStatsDto";
 export * from "./checkInStatsDtoCheckInsByMethod";
 export * from "./createAttendeeDto";
+export * from "./createAttendeeDtoCategory";
 export * from "./currentUserResponseDto";
 export * from "./currentUserResponseDtoRole";
 export * from "./detailedStatsDto";

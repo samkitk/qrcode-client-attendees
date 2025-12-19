@@ -5,6 +5,7 @@
  * API for managing event attendance through QR codes with multiple check-in methods, staff authentication, and RBAC
  * OpenAPI spec version: 1.0
  */
+import type { CreateAttendeeDtoCategory } from "./createAttendeeDtoCategory";
 
 export interface CreateAttendeeDto {
   /** Registration timestamp */
@@ -29,4 +30,6 @@ export interface CreateAttendeeDto {
   confirmationNumber: string;
   /** Taluka name */
   taluka?: string;
+  /** Attendee category */
+  category: CreateAttendeeDtoCategory;
 }
