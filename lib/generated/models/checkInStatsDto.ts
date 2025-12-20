@@ -21,4 +21,6 @@ export interface CheckInStatsDto {
   recentCheckIns: RecentCheckInDto[];
   /** Count of override check-ins */
   overridesCount: number;
+  /** Total unique attendees who downloaded QR code */
+  totalQrDownloads: number;
 }
