@@ -76,32 +76,45 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
       <header className="bg-white border-b-2 border-[#3F6EA7] shadow-md">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col items-center text-center gap-4">
-            {/* Logo */}
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col items-center text-center gap-2">
+            {/* Logo - Reduced size */}
             <img
               src="/logo-1.png"
               alt="Gujarat State Yoga Board"
-              className="h-16 md:h-20 w-auto"
+              className="h-12 md:h-14 w-auto"
             />
 
-            {/* Event Title - Gujarati */}
-            <h1 className="text-xl md:text-2xl font-bold text-[#3F6EA7]">
+            {/* Event Title - Gujarati - Reduced size */}
+            <h1 className="text-lg md:text-xl font-bold text-[#3F6EA7] leading-tight">
               ગુજરાત રાજ્ય યોગ બોર્ડના યોગ કોચ અને યોગ ટ્રેનર્સની દીક્ષાંત સમારોહ અને વિશ્વ ધ્યાન દિવસની ઉજવણી
             </h1>
 
-            {/* Event Title - English */}
-            <h2 className="text-lg md:text-xl font-semibold text-[#3F6EA7]">
+            {/* Event Title - English - Reduced size */}
+            <h2 className="text-base md:text-lg font-semibold text-[#3F6EA7] leading-tight">
               Convocation Ceremony of Yoga Coaches and Yoga Trainers of Gujarat State Yoga Board and Celebration of World Meditation Day
             </h2>
 
-            {/* Subtitle */}
-            <p className="text-gray-600 mt-2 text-sm md:text-base">
+            {/* Subtitle - Reduced margin */}
+            <p className="text-gray-600 mt-1 text-xs md:text-sm">
               Enter your mobile number or code to download your event QR code
             </p>
           </div>
         </div>
       </header>
+
+      {/* Banner Section - Header Image */}
+      <section className="w-full bg-white shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="overflow-hidden rounded-lg">
+            <img
+              src="/Header Image.png"
+              alt="Gujarat State Yoga Board - Event Banner"
+              className="w-full h-auto object-cover object-center"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 md:py-12">
